@@ -1,8 +1,8 @@
 package main
 
 import (
-	// "fmt"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -65,14 +65,21 @@ func init() {
 func UpdateFood(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
+	// fmt.Printf("params: %+v\n", params)
 	for index, item := range foods {
+		// fmt.Printf("item: %+v\n", item)
 		if item.ID == params["id"] {
-			// foods = append(foods[:index], foods[index+1:]...)
 			var inputFood Food
 			err := json.NewDecoder(r.Body).Decode(&inputFood)
+      fmt.Printf("decode: %+v\n", inputFood)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte(err.Error()))
+				return
+			}
+      if inputFood.ID != item.ID {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("ids do not match"))
 				return
 			}
 			foods[index] = inputFood
