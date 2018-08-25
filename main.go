@@ -1,102 +1,113 @@
 package main
-import(
-  // "fmt"
-  "encoding/json"
-  "log"
-  "net/http"
-  "math/rand"
-  "strconv"
-  "github.com/gorilla/mux"
+
+import (
+	// "fmt"
+	"encoding/json"
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
 )
+
 //Food Struct (Model)
 type Food struct {
-  ID string `json:"id"`
-  Name string `json:"name"`
-  Calories string `json:"calories"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Calories string `json:"calories"`
 }
+
 // Meal Struct (Model)
 type Meal struct {
-  ID string `json:"id"`
-  Isbn string `json:"isbn"`
-  Name string `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // Init foods var as a slice food struct
 var foods []Food
 
-//GET all foods
-func getFoods(w http.ResponseWriter, r *http.Request)  {
-  w.Header().Set("Content-Type", "application/json")
-  json.NewEncoder(w).Encode(foods)
-}
-//GET single food
-func getFood(w http.ResponseWriter, r *http.Request)  {
-  w.Header().Set("Content-Type", "application/json")
-  params := mux.Vars(r) //get params
-  //Loop through books and find with id
-  for _, item := range foods {
-    if item.ID == params["id"] {
-      json.NewEncoder(w).Encode(item)
-      return
-    }
-  }
-  json.NewEncoder(w).Encode(&Food{})
-}
-//GET create food item
-func createFood(w http.ResponseWriter, r *http.Request)  {
-  w.Header().Set("Content-Type", "application/json")
-  var food Food
-  _ = json.NewDecoder(r.Body).Decode(&food)
-  food.ID = strconv.Itoa(rand.Intn(10000)) //Mock ID - not safe for production
-  foods = append(foods, food)
-  json.NewEncoder(w).Encode(food)
-}
-//GET update food item
-func updateFood(w http.ResponseWriter, r *http.Request)  {
-  w.Header().Set("Content-Type", "application/json")
-  params := mux.Vars(r)
-  for index, item := range foods {
-    if item.id == params["id"] {
-      foods = append(foods[:index], foods[index+1:]...)
-      var food Food
-      _ = json.NewDecoder(r.Body).Decode(&food)
-      food.ID = strconv.Itoa(rand.Intn(10000)) //Mock ID - not safe for production
-      foods = append(foods, food)
-      json.NewEncoder(w).Encode(food)
-      return
-    }
-  }
-  json.NewEncoder(w).Encode(food)
-}
-//GET delete food item
-func deleteFood(w http.ResponseWriter, r *http.Request)  {
-  w.Header().Set("Content-Type", "application/json")
-  params := mux.Vars(r)
-  for index, item := range foods {
-    if item.id == params["id"] {
-      foods = append(foods[:index], foods[index+1:]...)
-      break
-    }
-  }
-  json.NewEncoder(w).Encode(food)
+func init() {
+	// Mock data - @todo - implement DB
+	foods = append(foods, Food{ID: "1", Name: "Banana", Calories: "100"})
+	foods = append(foods, Food{ID: "2", Name: "Pie", Calories: "300"})
+	foods = append(foods, Food{ID: "3", Name: "Hot dog", Calories: "10"})
+	foods = append(foods, Food{ID: "4", Name: "Strawberries", Calories: "100"})
 }
 
-func main()  {
-  //Init Router
-  router := mux.NewRouter()
+//
+// //GET all foods
+// func getFoods(w http.ResponseWriter, r *http.Request)  {
+//   w.Header().Set("Content-Type", "application/json")
+//   json.NewEncoder(w).Encode(foods)
+// }
+// //GET single food
+// func getFood(w http.ResponseWriter, r *http.Request)  {
+//   w.Header().Set("Content-Type", "application/json")
+//   params := mux.Vars(r) //get params
+//   //Loop through books and find with id
+//   for _, item := range foods {
+//     if item.ID == params["id"] {
+//       json.NewEncoder(w).Encode(item)
+//       return
+//     }
+//   }
+//   json.NewEncoder(w).Encode(&Food{})
+// }
+// //POST create food item
+// func createFood(w http.ResponseWriter, r *http.Request)  {
+//   w.Header().Set("Content-Type", "application/json")
+//   var food Food
+//   _ = json.NewDecoder(r.Body).Decode(&food)
+//   food.ID = strconv.Itoa(rand.Intn(10000)) //Mock ID - not safe for production
+//   foods = append(foods, food)
+//   json.NewEncoder(w).Encode(food)
+// }
 
-  // Mock data - @todo - implement DB
-  food = append(foods, Food{ID: "1", Name: "Banana", Calories: "100", Meal: &Meal{Name: "Breakfast"}})
-  food = append(foods, Food{ID: "2", Name: "Pie", Calories: "300", Meal: &Meal{Name: "Snack"}})
-  food = append(foods, Food{ID: "3", Name: "Hot dog", Calories: "10", Meal: &Meal{Name: "Lunch"}})
-  food = append(foods, Food{ID: "4", Name: "Strawberries", Calories: "100", Meal: &Meal{Name: "Dinner"}})
+//PUT update food item
+func UpdateFood(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	for index, item := range foods {
+		if item.ID == params["id"] {
+			// foods = append(foods[:index], foods[index+1:]...)
+			var inputFood Food
+			err := json.NewDecoder(r.Body).Decode(&inputFood)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(err.Error()))
+				return
+			}
+			foods[index] = inputFood
+			json.NewEncoder(w).Encode(inputFood)
+			return
+		}
+	}
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte("Food not found"))
+}
 
-  //Route handlers / endpoints
-  router.HandleFunc("/api/v1/foods", getFoods).Methods("GET")
-  router.HandleFunc("/api/v1/foods/{id}", getFood).Methods("GET")
-  router.HandleFunc("/api/v1/foods", createFood).Methods("POST")
-  router.HandleFunc("/api/v1/foods/{id}", updateFood).Methods("PUT")
-  router.HandleFunc("/api/v1/foods/{id}", deleteFood).Methods("DELETE")
+//
+// //GET delete food item
+// func deleteFood(w http.ResponseWriter, r *http.Request)  {
+//   w.Header().Set("Content-Type", "application/json")
+//   params := mux.Vars(r)
+//   for index, item := range foods {
+//     if item.ID == params["id"] {
+//       foods = append(foods[:index], foods[index+1:]...)
+//       break
+//     }
+//   }
+//   json.NewEncoder(w).Encode(food)
+// }
 
-  log.Fatal(http.ListenAndServe(":8000", router))
+func main() {
+	//Init Router
+	router := mux.NewRouter()
+
+	//Route handlers / endpoints
+	// router.HandleFunc("/api/v1/foods", getFoods).Methods("GET")
+	// router.HandleFunc("/api/v1/foods/{id}", getFood).Methods("GET")
+	// router.HandleFunc("/api/v1/foods", createFood).Methods("POST")
+	router.HandleFunc("/api/v1/foods/{id}", UpdateFood).Methods("PUT")
+	// router.HandleFunc("/api/v1/foods/{id}", deleteFood).Methods("DELETE")
+
+	log.Fatal(http.ListenAndServe(":8000", router))
 }
