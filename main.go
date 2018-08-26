@@ -6,31 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	// "os"
 )
-
-// func main() {
-//     a := App{}
-//     a.Initialize(
-//         os.Getenv("APP_DB_USERNAME"),
-//         os.Getenv("APP_DB_PASSWORD"),
-//         os.Getenv("APP_DB_NAME"))
-//
-//     a.Run(":8080")
-// }
-
-//Food Struct (Model)
-type Food struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Calories string `json:"calories"`
-}
-
-// Meal Struct (Model)
-type Meal struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
 
 // Init foods var as a slice food struct
 var foods []Food
