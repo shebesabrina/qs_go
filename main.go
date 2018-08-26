@@ -43,7 +43,7 @@ func init() {
 	foods = append(foods, Food{ID: "4", Name: "Strawberries", Calories: "100"})
 }
 
-//
+
 // //GET all foods
 // func getFoods(w http.ResponseWriter, r *http.Request)  {
 //   w.Header().Set("Content-Type", "application/json")
