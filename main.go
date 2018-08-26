@@ -6,7 +6,18 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	// "os"
 )
+
+// func main() {
+//     a := App{}
+//     a.Initialize(
+//         os.Getenv("APP_DB_USERNAME"),
+//         os.Getenv("APP_DB_PASSWORD"),
+//         os.Getenv("APP_DB_NAME"))
+//
+//     a.Run(":8080")
+// }
 
 //Food Struct (Model)
 type Food struct {
