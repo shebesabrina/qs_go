@@ -3,10 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-  "github.com/gorilla/mux"
 )
 
 // func TestGetAllFoodsSuccessfully(t *testing.T) {
@@ -97,12 +97,12 @@ func TestPutNoIdMatch(t *testing.T) {
 func TestPutNoBody(t *testing.T) {
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
 	// pass 'nil' as the third parameter.
-  buff := bytes.NewBufferString("")
+	buff := bytes.NewBufferString("")
 
 	request, err := http.NewRequest("PUT", "/api/v1/foods/1", buff)
-  if err != nil {
-    t.Fatal(err)
-  }
+	if err != nil {
+		t.Fatal(err)
+	}
 	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 	response := httptest.NewRecorder()
 	router := mux.NewRouter()
@@ -157,9 +157,9 @@ func createRequest(verb, url string, input Food) (*http.Request, error) {
 
 func parseResponse(response *httptest.ResponseRecorder) (Food, error) {
 	// Check the response body is what we expect.
-  	responseFood := Food{}
+	responseFood := Food{}
 
-	 err := json.NewDecoder(response.Body).Decode(&responseFood)
+	err := json.NewDecoder(response.Body).Decode(&responseFood)
 
 	if err != nil {
 		return responseFood, err

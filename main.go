@@ -8,8 +8,18 @@ import (
 	"net/http"
 	"strconv"
 	"math/rand"
-	"github.com/rs/cors"
+	// "github.com/rs/cors"
+	"github.com/gorilla/handlers"
+	"os"
 )
+
+func getPort() string {
+  p := os.Getenv("PORT")
+  if p != "" {
+    return ":" + p
+  }
+  return ":3000"
+}
 
 // Init foods var as a slice food struct
 var foods []Food
@@ -95,20 +105,17 @@ func deleteFood(w http.ResponseWriter, r *http.Request)  {
   json.NewEncoder(w).Encode(foods)
 }
 
+
 func main() {
 	//Init Router
 	router := mux.NewRouter()
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte("{\"hello\": \"world\"}"))
-	})
 
-	// cors.Default() setup the middleware with default options being
-	// all origins accepted with simple methods (GET, POST). See
-	// documentation below for more options.
-	handler := cors.Default().Handler(mux)
-	http.ListenAndServe(":8080", handler)
+	port := getPort()
+
+	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With"})
+  allowedOrigins := handlers.AllowedOrigins([]string{"*"})
+  allowedMethods := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
+
 
 	//Route handlers / endpoints
 	router.HandleFunc("/api/v1/foods", getFoods).Methods("GET")
@@ -117,5 +124,7 @@ func main() {
 	router.HandleFunc("/api/v1/foods/{id}", UpdateFood).Methods("PUT")
 	router.HandleFunc("/api/v1/foods/{id}", deleteFood).Methods("DELETE")
 
+	log.Fatal(http.ListenAndServe(port, handlers.CORS(
+		allowedHeaders, allowedOrigins, allowedMethods)(router)))
 	// log.Fatal(http.ListenAndServe(":8000", router))
 }
