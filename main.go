@@ -18,7 +18,7 @@ func getPort() string {
   if p != "" {
     return ":" + p
   }
-  return ":3000"
+  return ":8080"
 }
 
 // Init foods var as a slice food struct
@@ -124,7 +124,9 @@ func main() {
 	router.HandleFunc("/api/v1/foods/{id}", UpdateFood).Methods("PUT")
 	router.HandleFunc("/api/v1/foods/{id}", deleteFood).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(
+	log.Fatal(http.ListenAndServe(port, handlers.CORS(
 		allowedHeaders, allowedOrigins, allowedMethods)(router)))
-	// log.Fatal(http.ListenAndServe(":8000", router))
 }
+
+// runs the server:
+// go run $(ls -1 *.go | grep -v _test.go)
