@@ -124,7 +124,7 @@ func main() {
 	router.HandleFunc("/api/v1/foods/{id}", UpdateFood).Methods("PUT")
 	router.HandleFunc("/api/v1/foods/{id}", deleteFood).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(port, handlers.CORS(
+	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(
 		allowedHeaders, allowedOrigins, allowedMethods)(router)))
 	// log.Fatal(http.ListenAndServe(":8000", router))
 }
