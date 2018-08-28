@@ -130,3 +130,7 @@ func main() {
 
 // runs the server:
 // go run $(ls -1 *.go | grep -v _test.go)
+
+
+// runs in docker:
+// docker run -it --rm -p 8080:8080 sabrina go run $(ls -1 *.go | grep -v _test.go)
